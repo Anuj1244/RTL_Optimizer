@@ -1,0 +1,68 @@
+--- a//mnt/e/RTL_Optimizer-20260322T083825Z-3-001/RTL_Optimizer/rtl/enable2.v
++++ b/enable2_optimized.v
+@@ -10,6 +10,7 @@
+     sdata_sync_r,
+
+     id_out
+
+ );
+
++
+  // ---------------------------------------------------------------------------
+  // POWER OPTIMIZATION: AI-Injected Sequential Enable Logic
+  // Target Register: sresp_sync_r
+  // ---------------------------------------------------------------------------
+  wire seq_enable_1;
+  wire wire_sresp_sync_r_1_w3;
+  wire wire_sresp_sync_r_1_w1;
+  wire wire_sresp_sync_r_1_w4;
+  wire wire_sresp_sync_r_1_w6;
+  wire wire_sresp_sync_r_1_w10;
+  wire wire_sresp_sync_r_1_w8;
+  reg reg_sresp_sync_r_1_w5;
+  reg reg_sresp_sync_r_1_w2;
+  assign wire_sresp_sync_r_1_w1 = sresp_sync_r != 3'b000;
+  assign wire_sresp_sync_r_1_w3 = (sresp_req_sync_s & (!sresp_req_sync_r));
+  assign wire_sresp_sync_r_1_w4 = ((!(wire_sresp_sync_r_1_w1 & reg_sresp_sync_r_1_w2)) & (wire_sresp_sync_r_1_w3 | wire_sresp_sync_r_1_w1));
+  assign wire_sresp_sync_r_1_w6 = ((!reg_sresp_sync_r_1_w5) & (wire_sresp_sync_r_1_w3 | wire_sresp_sync_r_1_w1));
+  assign wire_sresp_sync_r_1_w8 = (wire_sresp_sync_r_1_w3 | wire_sresp_sync_r_1_w1);
+  assign wire_sresp_sync_r_1_w10 = (!intf_rst_n);
+  always @(posedge intf_clk or posedge wire_sresp_sync_r_1_w10)
+    begin
+    if (wire_sresp_sync_r_1_w10)
+      reg_sresp_sync_r_1_w5 <= 1'b0;
+    else
+      reg_sresp_sync_r_1_w5 <= wire_sresp_sync_r_1_w8;
+  end
+  always @(posedge intf_clk or posedge wire_sresp_sync_r_1_w10)
+    begin
+    if (wire_sresp_sync_r_1_w10)
+      reg_sresp_sync_r_1_w2 <= 1'b0;
+    else
+      reg_sresp_sync_r_1_w2 <= wire_sresp_sync_r_1_w1;
+  end
+  assign seq_enable_1 = (wire_sresp_sync_r_1_w4 | wire_sresp_sync_r_1_w6);
+  // ---------------------------------------------------------------------------
+
+ 
+
+   // Parameter declarations inside the module (Classic Style)
+
+   parameter OCP_DATA_WIDTH = 32;
+
+@@ -48,7 +49,7 @@
+       end
+
+       else if (sresp_req_sync_s == 1'b1 && sresp_req_sync_r == 1'b0)
+
+       begin
+
+-        sresp_sync_r <= sresp_r;
+
++        if (seq_enable_1) sresp_sync_r <= sresp_r; 
+
+         sdata_sync_r <= sdata_r;
+
+       end
+
+     end

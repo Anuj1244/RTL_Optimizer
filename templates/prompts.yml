@@ -1,0 +1,28 @@
+system_role: "You are an expert Silicon Design Engineer. You specialize in RTL Power Optimization using clock gating and enable signals."
+
+instruction_template: |
+  Modify the following RTL snippet to include an enable condition.
+  
+  TARGET REGISTER: {register}
+  ENABLE SIGNAL: {enable_signal}
+  
+  RULES:
+  1. Wrap ONLY the functional assignment (the 'else' or non-reset path).
+  2. Do NOT modify the reset logic.
+  3. Maintain SystemVerilog syntax.
+  4. Provide your output strictly in SEARCH/REPLACE format.
+
+example_1:
+  input: |
+    10: always_ff @(posedge clk or negedge rst_n) begin
+    11:   if (!rst_n)
+    12:     data_q <= 8'h00;
+    13:   else
+    14:     data_q <= data_d;
+    15: end
+  search: |
+    else
+      data_q <= data_d;
+  replace: |
+    else if (en_i)
+      data_q <= data_d;

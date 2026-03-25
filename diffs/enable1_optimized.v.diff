@@ -1,0 +1,52 @@
+--- a//mnt/e/RTL_Optimizer-20260322T083825Z-3-001/RTL_Optimizer/rtl/enable1.v
++++ b/enable1_optimized.v
+@@ -3,6 +3,7 @@
+     input wire rst_n,
+
+     output reg clk_out
+
+ );
+
++
+    // ---------------------------------------------------------------------------
+    // POWER OPTIMIZATION: AI-Injected Sequential Enable Logic
+    // Target Register: count
+    // ---------------------------------------------------------------------------
+    wire seq_enable_1;
+    wire wire_count_1_w5;
+    wire wire_count_1_w1;
+    reg reg_count_1_w2;
+    assign wire_count_1_w1 = count == 24'b100110001001011010000000;
+    assign wire_count_1_w5 = (!rst_n);
+    always @(posedge clk_in or posedge wire_count_1_w5)
+        begin
+        if (wire_count_1_w5)
+            reg_count_1_w2 <= 1'b0;
+        else
+            reg_count_1_w2 <= wire_count_1_w1;
+    end
+    assign seq_enable_1 = (!(wire_count_1_w1 & reg_count_1_w2));
+    // ---------------------------------------------------------------------------
+
+     reg [23:0] count;
+
+     always @(posedge clk_in or negedge rst_n) begin
+
+         if (!rst_n) begin
+
+@@ -14,7 +15,7 @@
+                 count <= 24'd0;
+
+                 clk_out <= ~clk_out;
+
+             end else begin
+
+-                count <= count + 1;
+
++                if (seq_enable_1) count <= count + 1; 
+
+             end
+
+         end
+
+     end

@@ -1,0 +1,50 @@
+--- a//mnt/e/RTL_Optimizer-20260322T083825Z-3-001/RTL_Optimizer/rtl/multi_fio.sv
++++ b/multi_fio_optimized.sv
+@@ -31,6 +31,7 @@
+   rptr,
+
+   entry_count
+
+ );
+
++
+  // ---------------------------------------------------------------------------
+  // POWER OPTIMIZATION: AI-Injected Sequential Enable Logic
+  // Target Register: mem
+  // ---------------------------------------------------------------------------
+  wire seq_enable_349;
+  wire wire_mem_349_w5;
+  reg reg_mem_349_w2;
+  assign wire_mem_349_w5 = (!rst_n);
+  always @(posedge clk or posedge wire_mem_349_w5)
+    begin
+    if (wire_mem_349_w5)
+      reg_mem_349_w2 <= 1'b0;
+    else
+      reg_mem_349_w2 <= clear;
+  end
+  assign seq_enable_349 = (!(clear & reg_mem_349_w2));
+  // ---------------------------------------------------------------------------
+
+ // ---parameter definition--------------------------------------------
+
+   parameter type T      = logic [7:0];  // data structure
+
+   parameter M           = 4;            // push signal width
+
+@@ -267,7 +268,7 @@
+               if (push_extend[j] & (j<M)) 
+
+                 mem[wind_wptr[j]] <= datain_seq[j];
+
+               else if (pop_extend[j])
+
+-                mem[wind_wptr[j]] <= 'b0;
+
++                if (seq_enable_349) mem[wind_wptr[j]] <= 'b0; 
+
+             end
+
+           end
+
+         end
